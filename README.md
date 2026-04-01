@@ -38,9 +38,10 @@ Scripts for generating the main figures:
 
 ### 3. Supplementary Codes (`Supp/`)
 Scripts for supplementary figures:
-- **S2:** Survival outcome by Flu Vaccine and Covid Infection
-- **S3:** Survival outcome in the I-SABR trial full cohort analysis
-- **Propensity match diagnostics** (Section 2d)
+a.	Consists of scripts generation for Supplementary S2 and S3
+b.	S2: Survival outcome by Flu Vaccine and Covid Infection
+c.	S3: Survival outcome in the I-SABR trial full cohort analysis
+d.	Propensity match diagnostic also generated in section 2 under (d)
 
 ---
 
