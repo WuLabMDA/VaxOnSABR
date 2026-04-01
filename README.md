@@ -14,7 +14,20 @@ To address immortal-time and selection biases inherent to observational vaccine 
 This repository holds the code for the **I-SABR-SELECT** framework, as described in *[citation forthcoming]*.
 
 ---
+## Installation
 
+To install the **development version** of I-SABR-SELECT using `pip`, run the following command:
+```bash
+pip install git+https://github.com/WuLabMDA/VaxOnSABR.git
+```
+
+Alternatively, I-SABR-SELECT can be cloned using the following command:
+```bash
+git clone https://github.com/WuLabMDA/VaxOnSABR.git
+cd VaxOnSABR
+```
+
+---
 ## Repository Structure
 ```
 VaxOnSABR/
