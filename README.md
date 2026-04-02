@@ -57,6 +57,14 @@ Scripts for generating supplementary figures:
 
 ---
 
+## Data Availability
+
+The dataset used in this study is publicly available on Zenodo with restricted access (no patient identifiers included).
+
+- **Access link:** [https://zenodo.org/records/19389276](https://zenodo.org/records/19389276?token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IjI1MDVjMGExLTk2MjAtNDc1OC1hNzY4LTc2MDYzY2E3MTZmMCIsImRhdGEiOnt9LCJyYW5kb20iOiI3YzA0NWQ2ZGEwNWZmNjNlYzg1ZjZiY2ZmYjM4NGFjMyJ9.xOyvv_U7FKAo2IXFMXAjfLChrQ4QJyz4QLukgpTZ7D2eYqKvS6ERLCKxDcqfhh8WlTtYf-5dRcxyujfOkFiXNA)
+- **Data DOI:** [https://doi.org/10.5281/zenodo.19389276](https://doi.org/10.5281/zenodo.19389276)
+
+---
 ## Citation
 
 > *Citation will be added upon publication.*
