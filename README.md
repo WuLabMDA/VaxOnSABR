@@ -74,9 +74,13 @@ Full scripts are provided to generate exact results demonstrated in the paper. T
 | Tutorial 1 | Immortal bias correction in unmatched population |
 | Tutorial 2 | Immortal bias correction in matched population |
 | Tutorial 3 | Selection bias correction |
+
 ---
-Tutorial 1: Immortal Bias Correction in Unmatched Population (Python)
+
+### Tutorial 1: Immortal Bias Correction in Unmatched Population (Python)
+
 Download data from Zenodo as provided in the link above.
+
 ```python
 #---Import required libraries---
 import numpy as np
@@ -96,8 +100,7 @@ df_data = pd.read_excel(os.path.join(root_dir, "Covid_data_v2.xlsx"), sheet_name
 x_scale = [0, 12, 24, 36, 48, 60]  # censored at 5 years
 extra_space = 2
 k_min0 = 0
-k_min1 = 0  # parameter that controls whether or not to show if number at risk
-             # lower than a certain threshold for the last time points.
+k_min1 = 0
 
 #---Define endpoint---
 time_col = 'RFS'
@@ -118,9 +121,13 @@ long_df = bc.build_timevarying_table(df_out)
 #---Simon-Makuch visualization---
 figg, _, _ = bc.plot_simon_makuch([], long_df, 'TV-cox' + time_col, x_scale, extra_space, k_min0, k_min1)
 ```
-![Tutorial 1 Python - Simon-Makuch plot (unmatched cohort)](image1.png)
+
+<img src="image1.png" width="500">
+
 ---
-Tutorial 1: Immortal Bias Correction in Unmatched Population (R)
+
+### Tutorial 1: Immortal Bias Correction in Unmatched Population (R)
+
 ```r
 #---Import required libraries---
 library(survival)
@@ -160,8 +167,6 @@ cox_tv <- coxph(Surv(start, stop, event) ~ vax_tv, data = long_df)
 cox_sum <- summary(cox_tv)
 HR <- round(cox_sum$coef[1, "exp(coef)"], 2)
 pval <- signif(cox_sum$coef[1, "Pr(>|z|)"], 3)
-
-# 95% CI
 lower_CI <- round(cox_sum$conf.int[1, "lower .95"], 2)
 upper_CI <- round(cox_sum$conf.int[1, "upper .95"], 2)
 label_text <- sprintf("HR = %.2f (95%% CI %.2f--%.2f)\nP = %.3g", HR, lower_CI, upper_CI, pval)
@@ -185,9 +190,13 @@ p <- ggsurvplot(fit_sm,
 p$plot <- p$plot + annotate("text", x = 40, y = 0.2, label = label_text, size = 5)
 print(p)
 ```
-![Tutorial 1 R - Simon-Makuch plot (unmatched cohort)](image2.png)
+
+<img src="image2.png" width="500">
+
 ---
-Tutorial 2: Immortal Bias Correction in Matched Population (Python)
+
+### Tutorial 2: Immortal Bias Correction in Matched Population (Python)
+
 ```python
 #-----Data prep for 1 to 1 matching-----
 df_data = pd.read_excel("Covid_data_v2.xlsx", sheet_name='Main')
@@ -204,7 +213,7 @@ base_df = utils.mapping(base_df, hist_ref, hist_other)
 base_df['Treatment'] = base_df['Treatment'].map({'No': 0, 'Yes': 1})
 
 #-----Find match sample using PSM-----
-covars = ['Age', 'TumorSize', "Gender", "ECOG", 'Smoking_history']  # covariates used for matching
+covars = ['Age', 'TumorSize', "Gender", "ECOG", 'Smoking_history']
 cal = 0.2
 matched = utils.PSM(covars, base_df, cal)
 
@@ -218,24 +227,30 @@ smd = smd_before.merge(smd_after, on="Variable", how="inner")
 print(tabulate(smd, headers='keys', tablefmt='pretty', showindex=False))
 utils.loveplot(smd)
 ```
-![PSM diagnostics - propensity score distributions](image3.png)
 
-![PSM diagnostics - Love plot SMD before vs after matching](image4.png)
+<img src="image3.png" width="600">
 
+<img src="image4.png" width="500">
+
+```python
 #-----Then run time-bias correction-----
 # Follow similar steps as in Tutorial 1 above using 'matched' output
-
 df_matched = df_data[df_data['MRN'].isin(matched['MRN'])].reset_index(drop=True)
 long_df = bc.build_timevarying_table(df_matched)
 figg, _, _ = bc.plot_simon_makuch([], long_df, 'TV-cox' + time_col, x_scale, extra_space, k_min0, k_min1)
 ```
-![Tutorial 2 - Simon-Makuch plot (matched cohort)](image5.png)
+
+<img src="image5.png" width="500">
+
 ---
-Tutorial 3: Selection Bias Correction (Python)
+
+### Tutorial 3: Selection Bias Correction (Python)
+
 There are three steps to perform:
-Prepare the data (mapping, categorization, etc.)
-Set the reference group
-Multivariate adjustment
+1. Prepare the data (mapping, categorization, etc.)
+2. Set the reference group
+3. Multivariate adjustment
+
 ```python
 #--Preprocess the data---
 median = np.median(base_df['Age'])
@@ -253,7 +268,7 @@ base_df = base_df.rename(columns={'Smoking_history': 'Smoker', 'Event_Date': 'Va
 base_df["Gender"] = pd.Categorical(base_df["Gender"], categories=["Male", "Female"])
 base_df["Smoker"] = pd.Categorical(base_df["Smoker"], categories=["Yes", "No"])
 base_df["Had_covid_infection"] = pd.Categorical(base_df["Had_covid_infection"], categories=["Yes", "No"])
-base_df["Race"] = pd.Categorical(base_df["Race"], categories=["White", "Non_white"])  # adjust to your data
+base_df["Race"] = pd.Categorical(base_df["Race"], categories=["White", "Non_white"])
 base_df["ECOG"] = pd.Categorical(base_df["ECOG"], categories=["0-1", "2-3"])
 base_df["Histology"] = pd.Categorical(base_df["Histology"], categories=[hist_ref, hist_other])
 base_df["TumorSize"] = pd.Categorical(base_df["TumorSize"], categories=[">=3cm", "<3cm"])
@@ -271,4 +286,5 @@ results = pd.DataFrame({
 
 print(results)
 ```
-![Tutorial 3 - Selection bias correction forest plot](image6.png)
+
+<img src="image6.png" width="600">
