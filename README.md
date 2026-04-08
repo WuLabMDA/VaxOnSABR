@@ -65,7 +65,7 @@ The data utilized in this study can be provided upon reasonable request. Please 
 - **Data DOI:** [https://doi.org/10.5281/zenodo.19389276](https://doi.org/10.5281/zenodo.19389276)
 
 ---
-## Tutorials
+Tutorials
 Full scripts are provided to generate exact results demonstrated in the paper. Tutorials are meant to demonstrate some important parts such as how immortal bias is being corrected, etc. Some tutorials are provided in both Python and R so that results can be verified and replicated on both platforms.
 Tutorial 1: Immortal bias correction in unmatched population
 Tutorial 2: Immortal bias correction in matched population
@@ -114,6 +114,7 @@ long_df = bc.build_timevarying_table(df_out)
 #---Simon-Makuch visualization---
 figg, _, _ = bc.plot_simon_makuch([], long_df, 'TV-cox' + time_col, x_scale, extra_space, k_min0, k_min1)
 ```
+![Tutorial 1 Python - Simon-Makuch plot (unmatched cohort)](image1.png)
 ---
 Tutorial 1: Immortal Bias Correction in Unmatched Population (R)
 ```r
@@ -180,6 +181,7 @@ p <- ggsurvplot(fit_sm,
 p$plot <- p$plot + annotate("text", x = 40, y = 0.2, label = label_text, size = 5)
 print(p)
 ```
+![Tutorial 1 R - Simon-Makuch plot (unmatched cohort)](image2.png)
 ---
 Tutorial 2: Immortal Bias Correction in Matched Population (Python)
 ```python
@@ -212,6 +214,10 @@ smd = smd_before.merge(smd_after, on="Variable", how="inner")
 print(tabulate(smd, headers='keys', tablefmt='pretty', showindex=False))
 utils.loveplot(smd)
 
+![PSM diagnostics - propensity score distributions](image3.png)
+
+![PSM diagnostics - Love plot (SMD before vs after matching)](image4.png)
+
 #-----Then run time-bias correction-----
 # Follow similar steps as in Tutorial 1 above using 'matched' output
 
@@ -219,6 +225,7 @@ df_matched = df_data[df_data['MRN'].isin(matched['MRN'])].reset_index(drop=True)
 long_df = bc.build_timevarying_table(df_matched)
 figg, _, _ = bc.plot_simon_makuch([], long_df, 'TV-cox' + time_col, x_scale, extra_space, k_min0, k_min1)
 ```
+![Tutorial 2 - Simon-Makuch plot (matched cohort)](image5.png)
 ---
 Tutorial 3: Selection Bias Correction (Python)
 There are three steps to perform:
@@ -260,6 +267,4 @@ results = pd.DataFrame({
 
 print(results)
 ```
-
----
-
+![Tutorial 3 - Selection bias correction forest plot](image6.png)
