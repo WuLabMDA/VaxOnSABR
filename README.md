@@ -65,11 +65,15 @@ The data utilized in this study can be provided upon reasonable request. Please 
 - **Data DOI:** [https://doi.org/10.5281/zenodo.19389276](https://doi.org/10.5281/zenodo.19389276)
 
 ---
-Tutorials
+## Tutorials
+
 Full scripts are provided to generate exact results demonstrated in the paper. Tutorials are meant to demonstrate some important parts such as how immortal bias is being corrected, etc. Some tutorials are provided in both Python and R so that results can be verified and replicated on both platforms.
-Tutorial 1: Immortal bias correction in unmatched population
-Tutorial 2: Immortal bias correction in matched population
-Tutorial 3: Selection bias correction
+
+| Tutorial | Description |
+|----------|-------------|
+| Tutorial 1 | Immortal bias correction in unmatched population |
+| Tutorial 2 | Immortal bias correction in matched population |
+| Tutorial 3 | Selection bias correction |
 ---
 Tutorial 1: Immortal Bias Correction in Unmatched Population (Python)
 Download data from Zenodo as provided in the link above.
