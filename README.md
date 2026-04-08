@@ -244,7 +244,7 @@ base_df['Smoking_history'] = np.where(base_df['Smoking_history'] == 'Never', 'No
 base_df['ECOG'] = np.where(base_df['ECOG'] <= 1, '0-1', '2-3')
 base_df['Histology'] = np.where(base_df['Histology'] == hist_ref, hist_ref, hist_other)
 base_df['TumorSize'] = pd.to_numeric(base_df['TumorSize'])
-```
+
 cut_off = 3
 base_df['TumorSize'] = np.where(base_df['TumorSize'] < cut_off, '<3cm', '>=3cm')
 base_df = base_df.rename(columns={'Smoking_history': 'Smoker', 'Event_Date': 'Vaccine_Date'})
