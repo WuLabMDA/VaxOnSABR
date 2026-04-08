@@ -220,7 +220,7 @@ utils.loveplot(smd)
 
 ![PSM diagnostics - propensity score distributions](image3.png)
 
-![PSM diagnostics - Love plot (SMD before vs after matching)](image4.png)
+![PSM diagnostics - Love plot SMD before vs after matching](image4.png)
 
 #-----Then run time-bias correction-----
 # Follow similar steps as in Tutorial 1 above using 'matched' output
