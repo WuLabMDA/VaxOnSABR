@@ -45,15 +45,17 @@ Functions supporting three types of analyses:
 
 ### 2. Main Scripts (`Main/`)
 Scripts for generating the main figures:
-- **Fig 1(a-b):** Time bias correction
-- **Fig 1(c-d):** Vaccination timing during pandemic era
-- **Fig 1(e-f):** Comprehensive bias analysis
+- **Fig 1(a-b):** Time bias correction in real-world cohort
+- **Fig 1(c-d):** Vaccination timing in real-world cohort
+- **Fig 1(e-f):** Time bias correction on matched real-world cohort
+- **Fig 1(g-h):** Selection-bias correction on matched real-world cohort
+
 
 ### 3. Supplementary Codes (`Supp/`)
 Scripts for generating supplementary figures:
 - **S2:** Survival outcome by Flu Vaccine and Covid Infection
 - **S3:** Survival outcome in the I-SABR trial full cohort analysis
-- **Propensity match diagnostics:** Generated alongside Main Fig 1(d)
+- **Propensity match diagnostics:** Generated alongside in section 2 under (d)
 
 ---
 
