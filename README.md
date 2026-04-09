@@ -63,7 +63,6 @@ Scripts for generating supplementary figures:
 
 The data utilized in this study can be provided upon reasonable request. Please visit the following Zenodo link to request access.
 
-- **Access link:** [https://zenodo.org/records/19389276](https://zenodo.org/records/19389276?token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IjI1MDVjMGExLTk2MjAtNDc1OC1hNzY4LTc2MDYzY2E3MTZmMCIsImRhdGEiOnt9LCJyYW5kb20iOiI3YzA0NWQ2ZGEwNWZmNjNlYzg1ZjZiY2ZmYjM4NGFjMyJ9.xOyvv_U7FKAo2IXFMXAjfLChrQ4QJyz4QLukgpTZ7D2eYqKvS6ERLCKxDcqfhh8WlTtYf-5dRcxyujfOkFiXNA)
 - **Data DOI:** [https://doi.org/10.5281/zenodo.19389276](https://doi.org/10.5281/zenodo.19389276)
 
 ---
