@@ -16,6 +16,7 @@ from lifelines.plotting import add_at_risk_counts
 from lifelines import CoxTimeVaryingFitter
 import statsmodels.api as sm
 from lifelines import CoxPHFitter
+from scipy.stats import chi2
 
 def build_timevarying_table(
     df,
@@ -49,6 +50,7 @@ def build_timevarying_table(
                          "event": event, "vax_tv": 0,
                          "vax_time": "No",        # ← new column
                          "interval": 1})
+           
             continue
 
         # Case 2: vaccine before or at t0 → Pre-SABR
@@ -57,6 +59,7 @@ def build_timevarying_table(
                          "event": event, "vax_tv": 1,
                          "vax_time": "Pre",        # ← new column
                          "interval": 1})
+           
             continue
 
         # Case 3: vaccine during follow-up → Post-SABR, split into 2
@@ -70,10 +73,12 @@ def build_timevarying_table(
                      "event": event, "vax_tv": 1,
                      "vax_time": "Post",           # ← post-vaccine = Post
                      "interval": 2})
+        
 
     long_df = pd.DataFrame(rows)
     long_df = long_df.sort_values(["id", "start", "stop"]).reset_index(drop=True)
     long_df = long_df[long_df["stop"] > long_df["start"]]
+
     return long_df
 
 '''==============================================='''
@@ -152,10 +157,52 @@ def get_censor_marks(long_df, group, times, surv_plot, tcut, last_obs,var_tv):
 
     return cens_x, cens_y
 
+
+def build_tv_dummies(long_df, group_col, ref_group=None):
+    groups = sorted(long_df[group_col].unique())
+    if ref_group is None:
+        ref_group = groups[0]
+    non_ref = [g for g in groups if g != ref_group]
+    df_out  = long_df.copy()
+    dummy_cols = []
+    for g in non_ref:
+        col_name = f"{group_col}_{g}"          # ← fixed
+        df_out[col_name] = (df_out[group_col] == g).astype(int)
+        dummy_cols.append(col_name)
+    formula = ' + '.join(dummy_cols)
+    return df_out, formula, dummy_cols
+
+def ctv_metrics_nonbin_group(long_df, var_tv, ref_group=None):
+   
+    df_ready, formula, dummy_cols = build_tv_dummies(long_df, group_col=var_tv, ref_group=ref_group)
+    ctvf_full = CoxTimeVaryingFitter()
+    ctvf_full.fit(df_ready, id_col='id', start_col='start',stop_col='stop',event_col='event',formula=formula)                              
+
+    # ── overall p-value (Wald test) ───────────────────────────
+    wald_stat = float(ctvf_full.summary['z'].pow(2).sum())
+    df_params = len(ctvf_full.params_)
+    overall_p = chi2.sf(wald_stat, df=df_params)
+    p_val     = float(overall_p)
+    p_text    = f"p = {p_val:.4f}" if p_val >= 0.0001 else "p < 0.0001"
+
+    # ── pairwise HR per group ─────────────────────────────────
+    pairwise = {}
+    for key in dummy_cols:
+        hr    = np.exp(float(ctvf_full.params_[key]))
+        hr_lo = np.exp(float(ctvf_full.confidence_intervals_['95% lower-bound'][key]))
+        hr_hi = np.exp(float(ctvf_full.confidence_intervals_['95% upper-bound'][key]))
+        p_k   = float(ctvf_full.summary['p'][key])
+        p_k_text = f"p = {p_k:.4f}" if p_k >= 0.0001 else "p < 0.0001"
+        hr_text  = f"HR = {hr:.3f} (95% CI {hr_lo:.3f}–{hr_hi:.3f})"
+        pairwise[key] = f"{p_k_text}\n{hr_text}"
+
+    return p_text, pairwise
+
+
+
 def ctv_metrics(long_df,var_tv):
     ctvf = CoxTimeVaryingFitter()
-    ctvf.fit(long_df, id_col='id', start_col='start', stop_col='stop',
-             event_col='event', formula=var_tv)
+    ctvf.fit(long_df, id_col='id', start_col='start', stop_col='stop',event_col='event', formula=var_tv)
 
     hr    = np.exp(float(ctvf.params_[var_tv]))
     hr_lo = np.exp(float(ctvf.confidence_intervals_['95% lower-bound'][var_tv]))
@@ -164,6 +211,7 @@ def ctv_metrics(long_df,var_tv):
 
     p_text        = f"p = {p_val:.4f}" if p_val >= 0.0001 else "p < 0.0001"
     hr_text       = f"HR = {hr:.3f} (95% CI {hr_lo:.3f}-{hr_hi:.3f})"
+    #combined_text = f"{hr_text}\n{p_text}"
     combined_text = f"{p_text}\n{hr_text}"    
     
     return combined_text
@@ -333,15 +381,15 @@ def plot_simon_makuch(timing,long_df, title, scale, extra_space,k_min0=0, k_min1
         t_pre, s_pre_plot = apply_tcut_with_flat_tail(t_pre, s_pre, tcut_pre, last_obs_pre,max_time=max_time)
         t_post, s_post_plot = apply_tcut_with_flat_tail(t_post, s_post, tcut_post, last_obs_post,max_time=max_time)
         
-        # ─────── plot starts───────
-        combined_text = ctv_metrics(long_df,var_tv='vax_time')
+        # ─────── metrics (pairwise-using dummy───────
+        combined_text,_ = ctv_metrics_nonbin_group(long_df,var_tv='vax_time') # pairwise no pre vs post
         fig, ax = plt.subplots(figsize=(6, 5), dpi=300)
         ax.set_xlim(0, max_time)
         ax.step(t_no, s_no_plot, where="post", color="Red",linewidth=2.5, label="Never")
         ax.step(t_pre, s_pre_plot, where="post", color="royalblue", linewidth=2.5, label="Prior")
         ax.step(t_post, s_post_plot, where="post", color="green", linewidth=2.5, label="Post")
         
-        # ─────── pair-wise metrics───────
+        # ─────── pair-wise metrics (with pre vs post)───────
         df_pre_never = long_df[long_df['vax_time'].isin([0, 1])].reset_index(drop=True)
         pre_never_text = ctv_metrics(df_pre_never,var_tv='vax_time')
         df_post_never = long_df[long_df['vax_time'].isin([0, 2])].reset_index(drop=True)
@@ -428,7 +476,8 @@ def plot_simon_makuch(timing,long_df, title, scale, extra_space,k_min0=0, k_min1
         t3, s3_plot = apply_tcut_with_flat_tail(t3, s3, tcut3, last_obs3,max_time=max_time)
         
         # ─────── plot starts───────
-        combined_text = ctv_metrics(long_df,var_tv='new_group')
+
+        combined_text,pairwise_text = ctv_metrics_nonbin_group(long_df,var_tv='new_group')
         fig, ax = plt.subplots(figsize=(6, 5), dpi=300)
         ax.set_xlim(0, max_time)
         ax.step(t0, s0_plot, where="post", color="royalblue",linewidth=2.5, linestyle="dotted", label="sabr_no_vax",)
@@ -452,7 +501,7 @@ def plot_simon_makuch(timing,long_df, title, scale, extra_space,k_min0=0, k_min1
         plt.savefig(out_name, dpi=600, bbox_inches='tight')
         print(f"Saved: {out_name}")
         plt.show()
-        return fig,sm_group_0,sm_group_1,sm_group_2,sm_group_3
+        return fig,sm_group_0,sm_group_1,sm_group_2,sm_group_3,pairwise_text
 
 
 
